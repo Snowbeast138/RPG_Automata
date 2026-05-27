@@ -1,0 +1,14 @@
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\bin\Debug\net10.0\RPG_Juego.exe
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\bin\Debug\net10.0\RPG_Juego.deps.json
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\bin\Debug\net10.0\RPG_Juego.runtimeconfig.json
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\bin\Debug\net10.0\RPG_Juego.dll
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\bin\Debug\net10.0\RPG_Juego.pdb
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.AssemblyInfoInputs.cache
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.AssemblyInfo.cs
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.csproj.CoreCompileInputs.cache
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.dll
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\refint\RPG_Juego.dll
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.pdb
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.genruntimeconfig.cache
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\ref\RPG_Juego.dll
