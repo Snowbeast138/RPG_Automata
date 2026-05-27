@@ -557,6 +557,10 @@ namespace EFSM_Juego
             if (enemy != null)
             {
                 ShowEnemyInfo();
+                do
+                {
+                    ShowCombatMenu();
+                } while (enemy != null && player.HP > 0 && (enemy.HP > 0 || enemy.Forgiveness == 0));
             }
         }
 
@@ -579,8 +583,206 @@ namespace EFSM_Juego
                 WriteLine("¡Cuidado! Este enemigo es un jefe.");
             }
             WriteLine("------------------------------");
-        }   
-    }
+        } 
 
-    
+        public static void ShowCombatMenu()
+        {
+            WriteCentered("------------------------------------------");
+            WriteCentered("¿Qué acción desea realizar?");
+            WriteCentered("1 - Atacar");
+            WriteCentered("2 - Pedir Misericordia");
+            WriteCentered("3 - Curarse");
+            WriteCentered("4 - Huir");
+            WriteCentered("------------------------------------------");
+
+            WriteLine();
+            Write("Opcion:");
+
+            int optionSelected = -1;
+            do
+            {
+                string? input = ReadLine();
+                if (!int.TryParse(input, out optionSelected))
+                {
+                    WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 1 y 4");
+                    optionSelected = -1;
+                }
+                else if (optionSelected < 1 || optionSelected > 4)
+                {
+                    WriteLine("La opcion seleccionada no es valida, por favor ingrese un numero entre 1 y 4");
+                    optionSelected = -1;
+                }
+            }while (optionSelected < 1 || optionSelected > 4);
+
+            switch (optionSelected)
+            {
+                case 1:
+                    CombatRoutine();
+                    break;
+                case 2:
+                    // Implementar lógica de pedir misericordia
+                    WriteLine("Has pedido misericordia... (Funcionalidad no implementada aún)");
+                    break;
+                case 3:
+                    // Implementar lógica de curación
+                    WriteLine("Has intentado curarte... (Funcionalidad no implementada aún)");
+                    break;
+                case 4:
+                    // Implementar lógica de huir
+                    WriteLine("Has intentado huir... (Funcionalidad no implementada aún)");
+                    break;
+            }
+            
+            isLevelingUp(); // Verificamos si el jugador sube de nivel después de su acción en combate
+        }
+
+        public static float AttackBar()
+        {
+            int barLength = 30; // Tamaño de la barra
+            int pos = 0;
+            int direction = 1;
+            
+            // Ocultamos el cursor para que no parpadee molesto mientras se dibuja la barra
+            CursorVisible = false;
+
+            // Limpiamos cualquier tecla que se haya quedado en el buffer por accidente
+            while (KeyAvailable) ReadKey(true);
+
+            WriteLine("¡Presiona ESPACIO en el momento justo!");
+            
+            while (true)
+            {
+                // Detectamos si el usuario presionó la barra espaciadora
+                if (KeyAvailable)
+                {
+                    if (ReadKey(true).Key == ConsoleKey.Spacebar) break;
+                }
+
+                // Sobreescribimos la misma línea en la consola usando retorno de carro
+                string bar = "\r[";
+                for (int i = 0; i < barLength; i++)
+                {
+                    if (i == barLength / 2) 
+                        bar += (i == pos) ? "█" : "I"; // Centro exacto
+                    else 
+                        bar += (i == pos) ? "█" : "-"; // Espacio normal
+                }
+                bar += "]";
+                Write(bar);
+
+                // Movemos el indicador
+                pos += direction;
+                
+                // Si toca un borde, rebota
+                if (pos <= 0 || pos >= barLength - 1) direction *= -1;
+
+                // Esto controla la velocidad del minijuego (menor número = más rápido)
+                System.Threading.Thread.Sleep(30); 
+            }
+
+            CursorVisible = true;
+            WriteLine();
+
+            // Calculamos el multiplicador basado en la distancia al centro
+            float center = barLength / 2.0f;
+            float distance = Math.Abs(center - pos);
+            
+            // Daño máximo (1.0) en el centro, disminuye hacia los bordes (mínimo 0.2)
+            float accuracy = 1.0f - (distance / center);
+            if (accuracy < 0.2f) accuracy = 0.2f;
+
+            return accuracy;
+        }
+
+        public static void PlayerAttack()
+        {
+            float accuracyMultiplier = AttackBar();
+
+            // Calculamos el daño base afectado por el multiplicador del minijuego
+            float finalDamage = player.Damage * accuracyMultiplier;
+
+            // Evaluamos si el golpe es crítico
+            Random rand = new Random();
+            bool isCritical = rand.NextDouble() <= player.CritictRate;
+
+            if (isCritical)
+            {
+                finalDamage *= 2.0f; // Multiplicador por daño crítico
+                WriteLine("¡GOLPE CRÍTICO!");
+            }
+
+            int damageApplied = (int)Math.Round(finalDamage);
+            enemy.HP -= damageApplied; // Asumiendo que la clase Enemy tiene la propiedad HP
+
+            WriteLine($"Has atacado con una precisión del {Math.Round(accuracyMultiplier * 100)}%.");
+            WriteLine($"¡Has infligido {damageApplied} de daño!");
+        }
+
+        public static void EnemyAttack()
+        {
+            Random rand = new Random();
+            bool isCritical = rand.NextDouble() <= enemy.CritictRate;
+            if(isCritical)
+            {
+                player.HP -= (int)(enemy.Damage * 2.0f);
+                WriteLine("¡El enemigo ha asestado un GOLPE CRÍTICO!");
+                WriteLine($"Has recibido {(int)(enemy.Damage * 2.0f)} de daño.");
+            }
+            else
+            {
+                player.HP -= (int)enemy.Damage;
+                WriteLine($"El enemigo te ha atacado e infligido {(int)enemy.Damage} de daño.");
+            }
+        }
+
+        public static void CombatRoutine()
+        {
+            WriteLine("------------------------------");
+            WriteLine($"¡Inicia el intercambio de ataques contra {enemy.Type}!");
+
+            // Comparamos velocidades
+            if (player.Speed >= enemy.Speed)
+            {
+                WriteLine("¡Eres más rápido!.");
+                PlayerAttack();
+                
+                // Si el enemigo sobrevive, ataca de vuelta
+                if (enemy.HP > 0) 
+                {
+                    EnemyAttack(); // Deberás crear este método para restarle HP al player
+                }
+            }
+            else
+            {
+                WriteLine("¡El enemigo es más veloz y ataca primero!");
+                EnemyAttack(); 
+                
+                // Si el jugador sobrevive, ataca
+                if (player.HP > 0) 
+                {
+                    PlayerAttack();
+                }
+            }
+            
+            if (enemy.HP <= 0)
+            {
+                WriteLine("¡Has derrotado al enemigo!");
+                player.XP_STORAGED += enemy.XP_DROPPED; 
+                enemy = null; // Limpiamos el enemigo actual
+            }
+            WriteLine("------------------------------");
+        }
+
+        public static void isLevelingUp()
+        {
+            if (player.XP_STORAGED >= 100)
+            {
+                player.Level++;
+                player.XP_STORAGED -= 100; // Reiniciamos el XP acumulado para el siguiente nivel
+                player.HP = player.healt_max; // Restauramos la salud al máximo al subir de nivel
+                WriteLine($"¡Felicidades! Has subido al nivel {player.Level}.");
+            }
+        }
+
+    }
 }
