@@ -12,3 +12,4 @@ C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego
 C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.pdb
 C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.genruntimeconfig.cache
 C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\ref\RPG_Juego.dll
+C:\Users\snowb\OneDrive\Escritorio\CETI_ING\6to\Automatas\RPG_Automata\RPG_Juego\obj\Debug\net10.0\RPG_Juego.sourcelink.json

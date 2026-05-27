@@ -17,10 +17,14 @@ namespace EFSM_Juego
 
         static Automata world = DefiningWorld();
 
-        static Enemy[] enemies = DefiningEnemies(); 
+        static List<Enemy> enemies = new List<Enemy>();
+
+        static Enemy enemy= null;
 
         static void Main()
         {
+            DefiningEnemies();
+
             WriteLine("Bienvenido al pueblo de Tierras Lejanas " +
             player.name +
             "!");
@@ -32,8 +36,8 @@ namespace EFSM_Juego
         {
             WriteLine("Seleccione el tipo de personaje que desea jugar:");
             WriteLine("0 - Caballero");
-            WriteLine("1 - Sirena");
-            WriteLine("2 - Mago");
+            WriteLine("1 - Mago");
+            WriteLine("2 - Sirena");
             WriteLine("3 - Ladron");
 
             int indexCharacterSelected = -1;
@@ -64,7 +68,6 @@ namespace EFSM_Juego
         CreatingPlayer(Character[] characters, int indexCharacterSelected)
         {
             Character player = new Character();
-
             do
             {
                 Write("Ingrese el Nombre del Jugador:");
@@ -83,12 +86,16 @@ namespace EFSM_Juego
             {
                 //Cargamos con las stats predefinidas del personaje seleccionado
                 player.HP = characters[indexCharacterSelected].HP;
+                player.healt_max = characters[indexCharacterSelected].healt_max;
                 player.Speed = characters[indexCharacterSelected].Speed;
                 player.Damage = characters[indexCharacterSelected].Damage;
                 player.CritictRate =
                     characters[indexCharacterSelected].CritictRate;
                 player.CharacterType =
                     characters[indexCharacterSelected].CharacterType;
+                player.Level = characters[indexCharacterSelected].Level;
+                player.XP_STORAGED = characters[indexCharacterSelected].XP_STORAGED;
+                player.HealLevel = characters[indexCharacterSelected].HealLevel;
             }
             else
             {
@@ -122,12 +129,15 @@ namespace EFSM_Juego
             WriteLine("------------------------------");
             WriteLine("Nombre del Jugador: " + player.name);
             WriteLine("Tipo de Personaje: " + player.CharacterType);
-            WriteLine("HP: " + player.HP);
+            WriteLine("HP: " + player.HP+"/"+ player.healt_max);
             WriteLine("Velocidad: " + player.Speed);
             WriteLine("Daño: " + player.Damage);
             WriteLine("Probabilidad de Critico: " +
             player.CritictRate * 100 +
             "%");
+            WriteLine("Nivel: " + player.Level);
+            WriteLine("Experiencia Acumulada: " + player.XP_STORAGED+"/100");
+            WriteLine("Nivel de Curación: " + player.HealLevel);
             WriteLine("------------------------------");
         }
 
@@ -154,67 +164,76 @@ namespace EFSM_Juego
             Character[] characters =
                 new Character[] {
                     new Character {
-                        HP = 20,
-                        Speed = 5,
-                        Damage = 10,
-                        CritictRate = 0.1f,
-                        CharacterType = Character.Type.KNIGHT
+                        HP = 60, //health
+                        healt_max = 60, //health_max
+                        Speed = 5, //speed
+                        Damage = 20, //damage
+                        CritictRate = 0.25f, //critictRate
+                        Level = 1, //level
+                        XP_STORAGED = 0, //xp_storaged
+                        HealLevel = 5.0f, //healLevel
+                        CharacterType = Character.Type.KNIGHT //characterType
                     },
                     new Character {
-                        HP = 30,
-                        Speed = 1,
-                        Damage = 3,
-                        CritictRate = 0.15f,
-                        CharacterType = Character.Type.MERMAID
+                        HP = 100, //health
+                        healt_max = 100, //health_max
+                        Speed = 8, //speed
+                        Damage = 15, //damage
+                        CritictRate = 0.2f, //critictRate
+                        Level = 1, //level
+                        XP_STORAGED = 0, //xp_storaged
+                        HealLevel = 10.0f, //healLevel
+                        CharacterType = Character.Type.WIZARD //characterType
                     },
                     new Character {
-                        HP = 15,
-                        Speed = 10,
-                        Damage = 10,
-                        CritictRate = 0.2f,
-                        CharacterType = Character.Type.WIZARD
+                        HP = 80, //health
+                        healt_max = 80, //health_max
+                        Speed = 3, //speed
+                        Damage = 5, //damage
+                        CritictRate = 0.2f, //critictRate
+                        Level = 1, //level
+                        XP_STORAGED = 0, //xp_storaged
+                        HealLevel = 20.0f, //healLevel
+                        CharacterType = Character.Type.MERMAID //characterType
                     },
                     new Character {
-                        HP = 20,
-                        Speed = 15,
-                        Damage = 7,
-                        CritictRate = 0.25f,
-                        CharacterType = Character.Type.THIEF
-                    }
+                        HP = 40, //health
+                        healt_max = 40, //health_max
+                        Speed = 15, //speed
+                        Damage = 10, //damage
+                        CritictRate = 0.4f, //critictRate
+                        Level = 1, //level
+                        XP_STORAGED = 0, //xp_storaged
+                        HealLevel = 10.0f, //healLevel
+                        CharacterType = Character.Type.THIEF //characterType
+                    },
+    
                 };
 
             return characters;
         }
 
-        public static Enemy[] DefiningEnemies()
+        public static void DefiningEnemies()
         {
-            Enemy[] enemies =
-                new Enemy[] {
-                    //DESIERTO
-                    new Enemy(10, 5, 2, 0.05f, false, Enemy.EnemyType.ESCORPION),
-                    new Enemy(15, 3, 4, 0.1f, false, Enemy.EnemyType.GUSANO_DE_ARENA),
-                    new Enemy(20, 2, 6, 0.15f, false, Enemy.EnemyType.BUITRE_CARROÑERO),
-                    new Enemy(25, 4, 8, 0.2f, false, Enemy.EnemyType.LAGARTO_VENENOSO),
-                    //FIRE LANDS
-                    new Enemy(30, 7, 10, 0.3f, false, Enemy.EnemyType.LOBO_DE_FUEGO),
-                    new Enemy(25, 5, 8, 0.25f, false, Enemy.EnemyType.FUEGO_FATUO),
-                    new Enemy(35, 4, 12, 0.3f, false, Enemy.EnemyType.LAGARTO_ARDIENTE),
-                    new Enemy(40, 3, 15, 0.35f, false, Enemy.EnemyType.MAGMA_SLIME),
-                    //OCEAN
-                    new Enemy(20, 6, 5, 0.1f, false, Enemy.EnemyType.TIBURON_MOTOSIERRA),
-                    new Enemy(25,7, 7, 0.15f, false, Enemy.EnemyType.CANGREJO_PINZA_ANZUELO),
-                    new Enemy(15, 4, 5, 0.3f, false, Enemy.EnemyType.PIRATA_FANTASMA),
-                    new Enemy(10, 5, 3, 0.2f, false, Enemy.EnemyType.ELECTROMEDUSA),
 
+            enemies.Add( new Enemy(10,10, 5, 2, 0.05f, 0, 0.15f, 10, false, Enemy.EnemyType.ESCORPION, Enemy.EnemyZone.DESERT) );
+            enemies.Add( new Enemy(15,15, 3, 4, 0.1f, 0, 0.15f, 15, false, Enemy.EnemyType.GUSANO_DE_ARENA, Enemy.EnemyZone.DESERT) );
+            enemies.Add( new Enemy(20,20, 2, 6, 0.15f, 0, 0.15f, 20, false, Enemy.EnemyType.BUITRE_CARROÑERO, Enemy.EnemyZone.DESERT) );
+            enemies.Add( new Enemy(25,25, 4, 8, 0.2f, 0, 0.15f, 25, false, Enemy.EnemyType.LAGARTO_VENENOSO, Enemy.EnemyZone.DESERT) );
+            enemies.Add( new Enemy(30,30, 7, 10, 0.3f, 0, 0.05f, 30, false, Enemy.EnemyType.LOBO_DE_FUEGO, Enemy.EnemyZone.VOLCANIC) );
+            enemies.Add( new Enemy(25,25, 5, 8, 0.25f, 0, 0.1f, 25, false, Enemy.EnemyType.FUEGO_FATUO, Enemy.EnemyZone.VOLCANIC) );
+            enemies.Add( new Enemy(35,35, 4, 12, 0.3f, 0, 0.05f, 35, false, Enemy.EnemyType.LAGARTO_ARDIENTE, Enemy.EnemyZone.VOLCANIC) );
+            enemies.Add( new Enemy(40,40, 3, 15, 0.35f, 0, 0.1f, 40, false, Enemy.EnemyType.MAGMA_SLIME, Enemy.EnemyZone.VOLCANIC) );
+            enemies.Add( new Enemy(30,30, 6, 5, 0.1f, 0, 0.05f, 50, false, Enemy.EnemyType.TIBURON_MOTOSIERRA, Enemy.EnemyZone.AQUATIC) );
+            enemies.Add( new Enemy(50,50,7, 7, 0.15f, 0, 0.2f, 45, false, Enemy.EnemyType.CANGREJO_PINZA_ANZUELO,Enemy.EnemyZone.AQUATIC) );
+            enemies.Add( new Enemy(20,20, 4, 5, 0.3f, 0, 0.05f, 25, false, Enemy.EnemyType.PIRATA_FANTASMA,Enemy.EnemyZone.AQUATIC) );
+            enemies.Add( new Enemy(60,60, 5, 3, 0.2f, 0, 0.3f, 80, false,Enemy.EnemyType.ELECTROMEDUSA,Enemy.EnemyZone.AQUATIC) ) ;
+            enemies.Add( new Enemy(150,150, 6, 12, 0.25f, 0, 0.0f, 150, true, Enemy.EnemyType.REY_DEL_DESIERTO,Enemy.EnemyZone.DESERT)) ;
+            enemies.Add( new Enemy(200,200, 8, 20, 0.4f, 0, 0.0f, 200, true, Enemy.EnemyType.DRAGON_SALAMANDER,Enemy.EnemyZone.VOLCANIC));
+            enemies.Add( new Enemy(300,300, 6, 25, 0.45f, 0, 0.0f, 300, true, Enemy.EnemyType.CHUTULU,Enemy.EnemyZone.AQUATIC));
+            
 
-                    //BOSSES
-                    new Enemy(150, 6, 12, 0.25f, true, Enemy.EnemyType.REY_DEL_DESIERTO),
-                    new Enemy(200, 8, 20, 0.4f, true, Enemy.EnemyType.DRAGON_SALAMANDER),
-                    new Enemy(300, 6, 25, 0.45f, true, Enemy.EnemyType.CHUTULU),
-                    // Agrega más enemigos según sea necesario
-                };
-
-            return enemies;
+         
         }
 
         public static Automata DefiningWorld()
@@ -233,15 +252,13 @@ namespace EFSM_Juego
             world.AddState(new State("Jardin Oceaico", "q7"));
             world.AddState(new State("Campo de Las Merlusas", "q8"));
             world.AddState(new State("Ruinas Oceanicas", "q9"));
+            //Bossfight oceano
             world.AddState(new State("San Marisco", "q10"));
+            //Bossfight volcan
             world.AddState(new State("Castillo Salamander", "q11"));
-            world.AddState(new State("Olin Rio", "q12"));
+            //Bossfight desierto
+            world.AddState(new State("Olin Oir", "q12"));
 
-
-
-
-            //Direcciones 
-            // q0, Norte -> q1, Sur -> q0, Este -> q4, Oeste -> q7
 
 
 
@@ -426,6 +443,11 @@ namespace EFSM_Juego
                 // Imprimimos de dónde a dónde viajó
                 WriteLine($"Has viajado desde [{previousState.Context}] hacia [{world.CurrentState.Context}].");
 
+                if (isSpawningEnemy())
+                {
+                    SpawnEnemy();
+                }
+
                 CheckEnvironmentalEffects();
             }
         }
@@ -477,7 +499,87 @@ namespace EFSM_Juego
                 }
             }
         }
-        
+
+        public static bool isSpawningEnemy()
+        {
+            int spawnChance = 30; // Probabilidad de que aparezca un enemigo (30%)
+            Random random = new Random();
+            int roll = random.Next(1, 101); // Genera un número entre 1 y 100
+            if (roll > spawnChance)
+            {
+                // No aparece enemigo
+                WriteLine("El camino está despejado. No hay enemigos a la vista.");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public static void SpawnEnemy()
+        {
+            Random random = new Random();
+            switch(world.CurrentState.n_State)
+            {
+                case "q1":
+                case "q2":
+                case "q3":
+                case "q12":
+                //Cargamos la lista de enemigos del desierto
+                    List<Enemy> desertEnemies = enemies.FindAll(enemy => enemy.Zone == Enemy.EnemyZone.DESERT && enemy.isBoss == false);
+                    if (desertEnemies.Count > 0)                    {
+                        int index = random.Next(desertEnemies.Count);
+                        enemy = desertEnemies[index];
+                    }
+                    break;
+                case "q4":
+                case "q5":
+                case "q6":
+                case "q11":
+                    List<Enemy> volcanicEnemies = enemies.FindAll(enemy => enemy.Zone == Enemy.EnemyZone.VOLCANIC && enemy.isBoss == false);
+                    if (volcanicEnemies.Count > 0)                    {
+                        int index = random.Next(volcanicEnemies.Count);
+                        enemy = volcanicEnemies[index];
+                    }
+                    break;
+                case "q7":
+                case "q8":
+                case "q9":
+                case "q10":
+                    List<Enemy> aquaticEnemies = enemies.FindAll(enemy => enemy.Zone == Enemy.EnemyZone.AQUATIC && enemy.isBoss == false);
+                    if (aquaticEnemies.Count > 0)                    {
+                        int index = random.Next(aquaticEnemies.Count);
+                        enemy = aquaticEnemies[index];
+                    }
+                    break;
+            }
+            if (enemy != null)
+            {
+                ShowEnemyInfo();
+            }
+        }
+
+        public static void ShowEnemyInfo()
+        {
+            WriteLine("------------------------------");
+            WriteLine("¡Un enemigo salvaje aparece!");
+            WriteLine("Tipo de Enemigo: " + enemy.Type);
+            WriteLine("HP: " + enemy.HP + "/" + enemy.healt_max);
+            WriteLine("Velocidad: " + enemy.Speed);
+            WriteLine("Daño: " + enemy.Damage);
+            WriteLine("Probabilidad de Critico: " +
+            enemy.CritictRate * 100 +
+            "%");
+            WriteLine("Probabilidad de Misericordia: " +
+            enemy.Probability_Mercy * 100 +
+            "%");
+            if (enemy.isBoss)
+            {
+                WriteLine("¡Cuidado! Este enemigo es un jefe.");
+            }
+            WriteLine("------------------------------");
+        }   
     }
 
     
