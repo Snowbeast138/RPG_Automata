@@ -17,6 +17,8 @@ namespace EFSM_Juego
 
         static Automata world = DefiningWorld();
 
+        static Enemy[] enemies = DefiningEnemies(); 
+
         static void Main()
         {
             WriteLine("Bienvenido al pueblo de Tierras Lejanas " +
@@ -182,6 +184,37 @@ namespace EFSM_Juego
                 };
 
             return characters;
+        }
+
+        public static Enemy[] DefiningEnemies()
+        {
+            Enemy[] enemies =
+                new Enemy[] {
+                    //DESIERTO
+                    new Enemy(10, 5, 2, 0.05f, false, Enemy.EnemyType.ESCORPION),
+                    new Enemy(15, 3, 4, 0.1f, false, Enemy.EnemyType.GUSANO_DE_ARENA),
+                    new Enemy(20, 2, 6, 0.15f, false, Enemy.EnemyType.BUITRE_CARROÑERO),
+                    new Enemy(25, 4, 8, 0.2f, false, Enemy.EnemyType.LAGARTO_VENENOSO),
+                    //FIRE LANDS
+                    new Enemy(30, 7, 10, 0.3f, false, Enemy.EnemyType.LOBO_DE_FUEGO),
+                    new Enemy(25, 5, 8, 0.25f, false, Enemy.EnemyType.FUEGO_FATUO),
+                    new Enemy(35, 4, 12, 0.3f, false, Enemy.EnemyType.LAGARTO_ARDIENTE),
+                    new Enemy(40, 3, 15, 0.35f, false, Enemy.EnemyType.MAGMA_SLIME),
+                    //OCEAN
+                    new Enemy(20, 6, 5, 0.1f, false, Enemy.EnemyType.TIBURON_MOTOSIERRA),
+                    new Enemy(25,7, 7, 0.15f, false, Enemy.EnemyType.CANGREJO_PINZA_ANZUELO),
+                    new Enemy(15, 4, 5, 0.3f, false, Enemy.EnemyType.PIRATA_FANTASMA),
+                    new Enemy(10, 5, 3, 0.2f, false, Enemy.EnemyType.ELECTROMEDUSA),
+
+
+                    //BOSSES
+                    new Enemy(150, 6, 12, 0.25f, true, Enemy.EnemyType.REY_DEL_DESIERTO),
+                    new Enemy(200, 8, 20, 0.4f, true, Enemy.EnemyType.DRAGON_SALAMANDER),
+                    new Enemy(300, 6, 25, 0.45f, true, Enemy.EnemyType.CHUTULU),
+                    // Agrega más enemigos según sea necesario
+                };
+
+            return enemies;
         }
 
         public static Automata DefiningWorld()
