@@ -622,8 +622,7 @@ namespace EFSM_Juego
                     CombatRoutine();
                     break;
                 case 2:
-                    // Implementar lógica de pedir misericordia
-                    WriteLine("Has pedido misericordia... (Funcionalidad no implementada aún)");
+                   PrayMercy();
                     break;
                 case 3:
                     HealRoutine();
@@ -635,8 +634,7 @@ namespace EFSM_Juego
                     ShowPlayerInfo(player);
                     break;
                 case 6:
-                    // Implementar lógica de huir
-                    WriteLine("Has intentado huir... (Funcionalidad no implementada aún)");
+                    Flee();
                     break;
             }
             
@@ -876,12 +874,41 @@ namespace EFSM_Juego
             if (player.XP_STORAGED >= 100)
             {
                 player.Level++;
-                player.XP_STORAGED -= 100; // Reiniciamos el XP acumulado para el siguiente nivel
-                player.HP = player.healt_max; // Restauramos la salud al máximo al subir de nivel
+                player.XP_STORAGED -= 100; 
+                player.HP = player.healt_max; 
                 WriteLine($"¡Felicidades! Has subido al nivel {player.Level}.");
-                // Aquí podrías agregar mejoras de stats o habilidades al subir de nivel
+               
             }
         }
 
+        public static void PrayMercy()
+        {
+            Random rand = new Random();
+            if (rand.NextDouble() <= enemy.Probability_Mercy)
+            {
+                WriteLine("¡El enemigo ha sentido tu súplica y decide perdonarte! Has ganado la batalla sin luchar.");
+                enemy = null; // El enemigo desaparece
+            }
+            else
+            {
+                WriteLine("El enemigo ignora tu petición de misericordia y continúa atacando.");
+                EnemyAttack(); // El enemigo ataca como castigo por pedir misericordia
+            }
+        }
+
+        public static void Flee()
+        {
+            Random rand = new Random();
+            if (rand.NextDouble() <= 0.05) // 5% de probabilidad de huir exitosamente
+            {
+                WriteLine("¡Has logrado huir del combate! Escapas ileso.");
+                enemy = null; // El enemigo desaparece
+            }
+            else
+            {
+                WriteLine("¡No has podido escapar! El enemigo aprovecha tu intento de huida para atacarte.");
+                EnemyAttack(); // El enemigo ataca como castigo por intentar huir
+            }
+        }
     }
 }
