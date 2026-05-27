@@ -587,7 +587,7 @@ namespace EFSM_Juego
 
         public static void ShowCombatMenu()
         {
-            WriteCentered("------------------------------------------");
+           WriteCentered("------------------------------------------");
             WriteCentered("¿Qué acción desea realizar?");
             WriteCentered("1 - Atacar");
             WriteCentered("2 - Pedir Misericordia");
@@ -626,8 +626,7 @@ namespace EFSM_Juego
                     WriteLine("Has pedido misericordia... (Funcionalidad no implementada aún)");
                     break;
                 case 3:
-                    // Implementar lógica de curación
-                    WriteLine("Has intentado curarte... (Funcionalidad no implementada aún)");
+                    HealRoutine();
                     break;
                 case 4:
                     ShowEnemyInfo();
@@ -702,6 +701,55 @@ namespace EFSM_Juego
             return accuracy;
         }
 
+        public static float HealBar()
+        {
+            int barLength = 30;
+            int pos = 0;
+            int direction = 1;
+            
+            CursorVisible = false;
+
+            while (KeyAvailable) ReadKey(true);
+
+            WriteLine("¡Presiona ESPACIO en el momento justo!");
+            
+            while (true)
+            {
+                if (KeyAvailable)
+                {
+                    if (ReadKey(true).Key == ConsoleKey.Spacebar) break;
+                }
+
+                string bar = "\r[";
+                for (int i = 0; i < barLength; i++)
+                {
+                    if (i == barLength / 2) 
+                        bar += (i == pos) ? "♥" : "+"; 
+                    else 
+                        bar += (i == pos) ? "♥" : "-"; 
+                }
+                bar += "]";
+                Write(bar);
+
+                pos += direction;
+                
+                if (pos <= 0 || pos >= barLength - 1) direction *= -1;
+
+                System.Threading.Thread.Sleep(15); 
+            }
+
+            CursorVisible = true;
+            WriteLine();
+
+            float center = barLength / 2.0f;
+            float distance = Math.Abs(center - pos);
+            
+            float accuracy = 1.0f - (distance / center);
+            if (accuracy < 0.2f) accuracy = 0.2f;
+
+            return accuracy;
+        }
+
         public static void PlayerAttack()
         {
             float accuracyMultiplier = AttackBar();
@@ -724,6 +772,22 @@ namespace EFSM_Juego
 
             WriteLine($"Has atacado con una precisión del {Math.Round(accuracyMultiplier * 100)}%.");
             WriteLine($"¡Has infligido {damageApplied} de daño!");
+        }
+
+        public static void PlayerHeal()
+        {
+            float accuracyMultiplier = HealBar();
+
+            int healApplied = (int)Math.Round(player.HealLevel * accuracyMultiplier);
+            player.HP += healApplied;
+
+            if (player.HP > player.healt_max)
+            {
+                player.HP = player.healt_max;
+            }
+
+            WriteLine($"Te has curado con una precisión del {Math.Round(accuracyMultiplier * 100)}%.");
+            WriteLine($"¡Has recuperado {healApplied} de HP! Tu salud actual es {player.HP}/{player.healt_max}.");
         }
 
         public static void EnemyAttack()
@@ -775,8 +839,34 @@ namespace EFSM_Juego
             if (enemy.HP <= 0)
             {
                 WriteLine("¡Has derrotado al enemigo!");
-                player.XP_STORAGED += enemy.XP_DROPPED; 
+                player.XP_STORAGED += enemy.XP_DROPPED; // Ejemplo de recompensa por victoria
                 enemy = null; // Limpiamos el enemigo actual
+            }
+            WriteLine("------------------------------");
+        }
+
+        public static void HealRoutine()
+        {
+            WriteLine("------------------------------");
+
+            if (player.Speed >= enemy.Speed)
+            {
+                PlayerHeal();
+                
+                if (enemy.HP > 0) 
+                {
+                    EnemyAttack(); 
+                }
+            }
+            else
+            {
+                WriteLine("¡El enemigo es más veloz y ataca primero!");
+                EnemyAttack(); 
+                
+                if (player.HP > 0) 
+                {
+                    PlayerHeal();
+                }
             }
             WriteLine("------------------------------");
         }
@@ -789,6 +879,7 @@ namespace EFSM_Juego
                 player.XP_STORAGED -= 100; // Reiniciamos el XP acumulado para el siguiente nivel
                 player.HP = player.healt_max; // Restauramos la salud al máximo al subir de nivel
                 WriteLine($"¡Felicidades! Has subido al nivel {player.Level}.");
+                // Aquí podrías agregar mejoras de stats o habilidades al subir de nivel
             }
         }
 
