@@ -592,7 +592,9 @@ namespace EFSM_Juego
             WriteCentered("1 - Atacar");
             WriteCentered("2 - Pedir Misericordia");
             WriteCentered("3 - Curarse");
-            WriteCentered("4 - Huir");
+            WriteCentered("4- Informacion del Enemigo");
+            WriteCentered("5- Informacion del Personaje");
+            WriteCentered("6 - Huir");
             WriteCentered("------------------------------------------");
 
             WriteLine();
@@ -604,15 +606,15 @@ namespace EFSM_Juego
                 string? input = ReadLine();
                 if (!int.TryParse(input, out optionSelected))
                 {
-                    WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 1 y 4");
+                    WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 1 y 6");
                     optionSelected = -1;
                 }
-                else if (optionSelected < 1 || optionSelected > 4)
+                else if (optionSelected < 1 || optionSelected > 6)
                 {
-                    WriteLine("La opcion seleccionada no es valida, por favor ingrese un numero entre 1 y 4");
+                    WriteLine("La opcion seleccionada no es valida, por favor ingrese un numero entre 1 y 6");
                     optionSelected = -1;
                 }
-            }while (optionSelected < 1 || optionSelected > 4);
+            }while (optionSelected < 1 || optionSelected > 6);
 
             switch (optionSelected)
             {
@@ -628,6 +630,12 @@ namespace EFSM_Juego
                     WriteLine("Has intentado curarte... (Funcionalidad no implementada aún)");
                     break;
                 case 4:
+                    ShowEnemyInfo();
+                    break;
+                case 5:
+                    ShowPlayerInfo(player);
+                    break;
+                case 6:
                     // Implementar lógica de huir
                     WriteLine("Has intentado huir... (Funcionalidad no implementada aún)");
                     break;
