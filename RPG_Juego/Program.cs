@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using static System.Console;
 
 namespace EFSM_Juego
@@ -9,25 +8,25 @@ namespace EFSM_Juego
     {
         static Character[] characters = DefiningCharacters();
 
-        static int
-            indexCharacterSelected = SelectingTypeCharacter(characters.Length);
+        static int indexCharacterSelected = SelectingTypeCharacter(characters.Length);
 
-        static Character
-            player = CreatingPlayer(characters, indexCharacterSelected);
+        static Character player = CreatingPlayer(characters, indexCharacterSelected);
 
         static Automata world = DefiningWorld();
 
         static List<Enemy> enemies = new List<Enemy>();
 
-        static Enemy enemy= null;
+        static Enemy enemy = null;
+
+        // Variables para el Autómata del Jefe
+        static bool bossIsDodging = false;
+        static int bossTurnCount = 0;
 
         static void Main()
         {
             DefiningEnemies();
 
-            WriteLine("Bienvenido al pueblo de Tierras Lejanas " +
-            player.name +
-            "!");
+            WriteLine("Bienvenido al pueblo de Tierras Lejanas " + player.name + ".");
 
             ShowMenu();
         }
@@ -46,17 +45,13 @@ namespace EFSM_Juego
                 string? input = ReadLine();
                 if (!int.TryParse(input, out indexCharacterSelected))
                 {
-                    WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 0 y " +
-                    (lenghtCharacters - 1));
-                    indexCharacterSelected = -1; // Reiniciar el índice para continuar el bucle
+                    WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 0 y " + (lenghtCharacters - 1));
+                    indexCharacterSelected = -1;
                 }
-                else if (
-                    indexCharacterSelected < 0 || indexCharacterSelected > 3
-                )
+                else if (indexCharacterSelected < 0 || indexCharacterSelected > 3)
                 {
-                    WriteLine("El indice del personaje seleccionado no es valido, ingrese un valor entre 0 y " +
-                    (lenghtCharacters - 1));
-                    indexCharacterSelected = -1; // Reiniciar el índice para continuar el bucle
+                    WriteLine("El indice del personaje seleccionado no es valido, ingrese un valor entre 0 y " + (lenghtCharacters - 1));
+                    indexCharacterSelected = -1;
                 }
             }
             while (indexCharacterSelected < 0 || indexCharacterSelected > 3);
@@ -64,8 +59,7 @@ namespace EFSM_Juego
             return indexCharacterSelected;
         }
 
-        public static Character
-        CreatingPlayer(Character[] characters, int indexCharacterSelected)
+        public static Character CreatingPlayer(Character[] characters, int indexCharacterSelected)
         {
             Character player = new Character();
             do
@@ -74,25 +68,19 @@ namespace EFSM_Juego
                 player.name = ReadLine();
                 if (player.name == null || player.name == "")
                 {
-                    WriteLine("El nombre del jugador no puede ser nulo, por favor ingrese un nombre valido");
+                    WriteLine("El nombre del jugador no puede ser nulo, por favor ingrese un nombre valido.");
                 }
             }
             while (player.name == null);
 
-            if (
-                indexCharacterSelected >= 0 &&
-                indexCharacterSelected < characters.Length
-            )
+            if (indexCharacterSelected >= 0 && indexCharacterSelected < characters.Length)
             {
-                //Cargamos con las stats predefinidas del personaje seleccionado
                 player.HP = characters[indexCharacterSelected].HP;
                 player.healt_max = characters[indexCharacterSelected].healt_max;
                 player.Speed = characters[indexCharacterSelected].Speed;
                 player.Damage = characters[indexCharacterSelected].Damage;
-                player.CritictRate =
-                    characters[indexCharacterSelected].CritictRate;
-                player.CharacterType =
-                    characters[indexCharacterSelected].CharacterType;
+                player.CritictRate = characters[indexCharacterSelected].CritictRate;
+                player.CharacterType = characters[indexCharacterSelected].CharacterType;
                 player.Level = characters[indexCharacterSelected].Level;
                 player.XP_STORAGED = characters[indexCharacterSelected].XP_STORAGED;
                 player.HealLevel = characters[indexCharacterSelected].HealLevel;
@@ -101,25 +89,20 @@ namespace EFSM_Juego
             {
                 do
                 {
-                    WriteLine("El indice del personaje seleccionado no es valido, ingrese un valor entre 0 y " +
-                    (characters.Length - 1));
+                    WriteLine("El indice del personaje seleccionado no es valido, ingrese un valor entre 0 y " + (characters.Length - 1));
                     string? input = ReadLine();
                     if (!int.TryParse(input, out indexCharacterSelected))
                     {
-                        WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 0 y " +
-                        (characters.Length - 1));
+                        WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 0 y " + (characters.Length - 1));
                         indexCharacterSelected = -1;
                     }
                     indexCharacterSelected = int.Parse(input);
                 }
-                while (indexCharacterSelected < 0 ||
-                    indexCharacterSelected > characters.Length - 1
-                );
+                while (indexCharacterSelected < 0 || indexCharacterSelected > characters.Length - 1);
             }
 
-            WriteLine("Personaje creado exitosamente!");
-
-            ShowPlayerInfo (player);
+            WriteLine("Personaje creado exitosamente.");
+            ShowPlayerInfo(player);
 
             return player;
         }
@@ -129,14 +112,12 @@ namespace EFSM_Juego
             WriteLine("------------------------------");
             WriteLine("Nombre del Jugador: " + player.name);
             WriteLine("Tipo de Personaje: " + player.CharacterType);
-            WriteLine("HP: " + player.HP+"/"+ player.healt_max);
+            WriteLine("HP: " + player.HP + "/" + player.healt_max);
             WriteLine("Velocidad: " + player.Speed);
             WriteLine("Daño: " + player.Damage);
-            WriteLine("Probabilidad de Critico: " +
-            player.CritictRate * 100 +
-            "%");
+            WriteLine("Probabilidad de Critico: " + player.CritictRate * 100 + "%");
             WriteLine("Nivel: " + player.Level);
-            WriteLine("Experiencia Acumulada: " + player.XP_STORAGED+"/100");
+            WriteLine("Experiencia Acumulada: " + player.XP_STORAGED + "/100");
             WriteLine("Nivel de Curación: " + player.HealLevel);
             WriteLine("------------------------------");
         }
@@ -149,99 +130,85 @@ namespace EFSM_Juego
             {
                 WriteLine("- " + state.Context);
             }
-            WriteLine("Lugar Actual del Personaje: " +
-            world.CurrentState.Context);
+            WriteLine("Lugar Actual del Personaje: " + world.CurrentState.Context);
             WriteLine("------------------------------");
         }
 
         public static Character[] DefiningCharacters()
         {
-            //Definimos los atributos de cada personaje y los enumeramos para diferenciar cada tipo con un valor numerico
-            //0 == Knight
-            //1 == Mermaid
-            //2== Wizard
-            //3 == Thief
-            Character[] characters =
-                new Character[] {
-                    new Character {
-                        HP = 60, //health
-                        healt_max = 60, //health_max
-                        Speed = 5, //speed
-                        Damage = 20, //damage
-                        CritictRate = 0.25f, //critictRate
-                        Level = 1, //level
-                        XP_STORAGED = 0, //xp_storaged
-                        HealLevel = 5.0f, //healLevel
-                        CharacterType = Character.Type.KNIGHT //characterType
-                    },
-                    new Character {
-                        HP = 100, //health
-                        healt_max = 100, //health_max
-                        Speed = 8, //speed
-                        Damage = 15, //damage
-                        CritictRate = 0.2f, //critictRate
-                        Level = 1, //level
-                        XP_STORAGED = 0, //xp_storaged
-                        HealLevel = 10.0f, //healLevel
-                        CharacterType = Character.Type.WIZARD //characterType
-                    },
-                    new Character {
-                        HP = 80, //health
-                        healt_max = 80, //health_max
-                        Speed = 3, //speed
-                        Damage = 5, //damage
-                        CritictRate = 0.2f, //critictRate
-                        Level = 1, //level
-                        XP_STORAGED = 0, //xp_storaged
-                        HealLevel = 20.0f, //healLevel
-                        CharacterType = Character.Type.MERMAID //characterType
-                    },
-                    new Character {
-                        HP = 40, //health
-                        healt_max = 40, //health_max
-                        Speed = 15, //speed
-                        Damage = 10, //damage
-                        CritictRate = 0.4f, //critictRate
-                        Level = 1, //level
-                        XP_STORAGED = 0, //xp_storaged
-                        HealLevel = 10.0f, //healLevel
-                        CharacterType = Character.Type.THIEF //characterType
-                    },
-    
-                };
+            Character[] characters = new Character[] {
+                new Character {
+                    HP = 60,
+                    healt_max = 60,
+                    Speed = 5,
+                    Damage = 20,
+                    CritictRate = 0.25f,
+                    Level = 1,
+                    XP_STORAGED = 0,
+                    HealLevel = 5.0f,
+                    CharacterType = Character.Type.KNIGHT
+                },
+                new Character {
+                    HP = 100,
+                    healt_max = 100,
+                    Speed = 8,
+                    Damage = 15,
+                    CritictRate = 0.2f,
+                    Level = 1,
+                    XP_STORAGED = 0,
+                    HealLevel = 10.0f,
+                    CharacterType = Character.Type.WIZARD
+                },
+                new Character {
+                    HP = 80,
+                    healt_max = 80,
+                    Speed = 3,
+                    Damage = 5,
+                    CritictRate = 0.2f,
+                    Level = 1,
+                    XP_STORAGED = 0,
+                    HealLevel = 20.0f,
+                    CharacterType = Character.Type.MERMAID
+                },
+                new Character {
+                    HP = 40,
+                    healt_max = 40,
+                    Speed = 15,
+                    Damage = 10,
+                    CritictRate = 0.4f,
+                    Level = 1,
+                    XP_STORAGED = 0,
+                    HealLevel = 10.0f,
+                    CharacterType = Character.Type.THIEF
+                }
+            };
 
             return characters;
         }
 
         public static void DefiningEnemies()
         {
-
-            enemies.Add( new Enemy(10,10, 5, 2, 0.05f, 0, 0.15f, 10, false, Enemy.EnemyType.ESCORPION, Enemy.EnemyZone.DESERT) );
-            enemies.Add( new Enemy(15,15, 3, 4, 0.1f, 0, 0.15f, 15, false, Enemy.EnemyType.GUSANO_DE_ARENA, Enemy.EnemyZone.DESERT) );
-            enemies.Add( new Enemy(20,20, 2, 6, 0.15f, 0, 0.15f, 20, false, Enemy.EnemyType.BUITRE_CARROÑERO, Enemy.EnemyZone.DESERT) );
-            enemies.Add( new Enemy(25,25, 4, 8, 0.2f, 0, 0.15f, 25, false, Enemy.EnemyType.LAGARTO_VENENOSO, Enemy.EnemyZone.DESERT) );
-            enemies.Add( new Enemy(30,30, 7, 10, 0.3f, 0, 0.05f, 30, false, Enemy.EnemyType.LOBO_DE_FUEGO, Enemy.EnemyZone.VOLCANIC) );
-            enemies.Add( new Enemy(25,25, 5, 8, 0.25f, 0, 0.1f, 25, false, Enemy.EnemyType.FUEGO_FATUO, Enemy.EnemyZone.VOLCANIC) );
-            enemies.Add( new Enemy(35,35, 4, 12, 0.3f, 0, 0.05f, 35, false, Enemy.EnemyType.LAGARTO_ARDIENTE, Enemy.EnemyZone.VOLCANIC) );
-            enemies.Add( new Enemy(40,40, 3, 15, 0.35f, 0, 0.1f, 40, false, Enemy.EnemyType.MAGMA_SLIME, Enemy.EnemyZone.VOLCANIC) );
-            enemies.Add( new Enemy(30,30, 6, 5, 0.1f, 0, 0.05f, 50, false, Enemy.EnemyType.TIBURON_MOTOSIERRA, Enemy.EnemyZone.AQUATIC) );
-            enemies.Add( new Enemy(50,50,7, 7, 0.15f, 0, 0.2f, 45, false, Enemy.EnemyType.CANGREJO_PINZA_ANZUELO,Enemy.EnemyZone.AQUATIC) );
-            enemies.Add( new Enemy(20,20, 4, 5, 0.3f, 0, 0.05f, 25, false, Enemy.EnemyType.PIRATA_FANTASMA,Enemy.EnemyZone.AQUATIC) );
-            enemies.Add( new Enemy(60,60, 5, 3, 0.2f, 0, 0.3f, 80, false,Enemy.EnemyType.ELECTROMEDUSA,Enemy.EnemyZone.AQUATIC) ) ;
-            enemies.Add( new Enemy(150,150, 6, 12, 0.25f, 0, 0.0f, 150, true, Enemy.EnemyType.REY_DEL_DESIERTO,Enemy.EnemyZone.DESERT)) ;
-            enemies.Add( new Enemy(200,200, 8, 20, 0.4f, 0, 0.0f, 200, true, Enemy.EnemyType.DRAGON_SALAMANDER,Enemy.EnemyZone.VOLCANIC));
-            enemies.Add( new Enemy(300,300, 6, 25, 0.45f, 0, 0.0f, 300, true, Enemy.EnemyType.CHUTULU,Enemy.EnemyZone.AQUATIC));
-            
-
-         
+            enemies.Add(new Enemy(10, 10, 5, 2, 0.05f, 0, 0.15f, 10, false, Enemy.EnemyType.ESCORPION, Enemy.EnemyZone.DESERT));
+            enemies.Add(new Enemy(15, 15, 3, 4, 0.1f, 0, 0.15f, 15, false, Enemy.EnemyType.GUSANO_DE_ARENA, Enemy.EnemyZone.DESERT));
+            enemies.Add(new Enemy(20, 20, 2, 6, 0.15f, 0, 0.15f, 20, false, Enemy.EnemyType.BUITRE_CARROÑERO, Enemy.EnemyZone.DESERT));
+            enemies.Add(new Enemy(25, 25, 4, 8, 0.2f, 0, 0.15f, 25, false, Enemy.EnemyType.LAGARTO_VENENOSO, Enemy.EnemyZone.DESERT));
+            enemies.Add(new Enemy(30, 30, 7, 10, 0.3f, 0, 0.05f, 30, false, Enemy.EnemyType.LOBO_DE_FUEGO, Enemy.EnemyZone.VOLCANIC));
+            enemies.Add(new Enemy(25, 25, 5, 8, 0.25f, 0, 0.1f, 25, false, Enemy.EnemyType.FUEGO_FATUO, Enemy.EnemyZone.VOLCANIC));
+            enemies.Add(new Enemy(35, 35, 4, 12, 0.3f, 0, 0.05f, 35, false, Enemy.EnemyType.LAGARTO_ARDIENTE, Enemy.EnemyZone.VOLCANIC));
+            enemies.Add(new Enemy(40, 40, 3, 15, 0.35f, 0, 0.1f, 40, false, Enemy.EnemyType.MAGMA_SLIME, Enemy.EnemyZone.VOLCANIC));
+            enemies.Add(new Enemy(30, 30, 6, 5, 0.1f, 0, 0.05f, 50, false, Enemy.EnemyType.TIBURON_MOTOSIERRA, Enemy.EnemyZone.AQUATIC));
+            enemies.Add(new Enemy(50, 50, 7, 7, 0.15f, 0, 0.2f, 45, false, Enemy.EnemyType.CANGREJO_PINZA_ANZUELO, Enemy.EnemyZone.AQUATIC));
+            enemies.Add(new Enemy(20, 20, 4, 5, 0.3f, 0, 0.05f, 25, false, Enemy.EnemyType.PIRATA_FANTASMA, Enemy.EnemyZone.AQUATIC));
+            enemies.Add(new Enemy(60, 60, 5, 3, 0.2f, 0, 0.3f, 80, false, Enemy.EnemyType.ELECTROMEDUSA, Enemy.EnemyZone.AQUATIC));
+            enemies.Add(new Enemy(150, 150, 6, 12, 0.25f, 0, 0.0f, 150, true, Enemy.EnemyType.REY_DEL_DESIERTO, Enemy.EnemyZone.DESERT));
+            enemies.Add(new Enemy(200, 200, 8, 20, 0.4f, 0, 0.0f, 200, true, Enemy.EnemyType.DRAGON_SALAMANDER, Enemy.EnemyZone.VOLCANIC));
+            enemies.Add(new Enemy(300, 300, 6, 25, 0.45f, 0, 0.0f, 300, true, Enemy.EnemyType.CHUTULU, Enemy.EnemyZone.AQUATIC));
         }
 
         public static Automata DefiningWorld()
         {
-            //Inicializamos el objeto Automata para el mundo
             Automata world = new Automata();
 
-            //Definimos el Estado y Su Contexto
             world.AddState(new State("Pueblo Inicial", "q0"));
             world.AddState(new State("Dunas Deserticas", "q1"));
             world.AddState(new State("Piramide Invertida", "q2"));
@@ -252,31 +219,18 @@ namespace EFSM_Juego
             world.AddState(new State("Jardin Oceaico", "q7"));
             world.AddState(new State("Campo de Las Merlusas", "q8"));
             world.AddState(new State("Ruinas Oceanicas", "q9"));
-            //Bossfight oceano
             world.AddState(new State("San Marisco", "q10"));
-            //Bossfight volcan
             world.AddState(new State("Castillo Salamander", "q11"));
-            //Bossfight desierto
             world.AddState(new State("Olin Oir", "q12"));
-
-
-
 
             return world;
         }
 
         public static void WriteCentered(string text)
         {
-            // Obtenemos el ancho total de la ventana de la consola
             int windowWidth = Console.WindowWidth;
-
-            // Calculamos cuántos espacios necesitamos a la izquierda para centrar el texto
             int padding = (windowWidth - text.Length) / 2;
-
-            // Aseguramos que el padding no sea negativo (por si el texto es más largo que la consola)
             padding = Math.Max(0, padding);
-
-            // Imprimimos el texto con los espacios añadidos
             WriteLine(text.PadLeft(text.Length + padding));
         }
 
@@ -301,12 +255,12 @@ namespace EFSM_Juego
                     string? input = ReadLine();
                     if (!int.TryParse(input, out optionSelected))
                     {
-                        WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 1 y 4");
+                        WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 1 y 4.");
                         optionSelected = -1;
                     }
                     else if (optionSelected < 1 || optionSelected > 4)
                     {
-                        WriteLine("La opcion seleccionada no es valida, por favor ingrese un numero entre 1 y 4");
+                        WriteLine("La opcion seleccionada no es valida, por favor ingrese un numero entre 1 y 4.");
                         optionSelected = -1;
                     }
 
@@ -316,19 +270,20 @@ namespace EFSM_Juego
                             Walkthrough();
                             break;
                         case 2:
-                            ShowPlayerInfo (player);
+                            ShowPlayerInfo(player);
                             break;
                         case 3:
-                            ShowWorldInfo (world);
+                            ShowWorldInfo(world);
                             break;
                         case 4:
-                            WriteLine("Gracias por jugar. ¡Hasta la próxima!");
+                            WriteLine("Finalizando juego.");
                             break;
                     }
                 }
                 while (optionSelected < 1 || optionSelected > 4);
             }
             while (player.HP <= 0 || optionSelected != 4);
+
             if (player.HP <= 0)
             {
                 WriteLine("El personaje ha muerto. Fin del juego.");
@@ -344,23 +299,22 @@ namespace EFSM_Juego
                 string? input = ReadLine();
                 if (!int.TryParse(input, out direction))
                 {
-                    WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 1 y 4");
+                    WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 1 y 4.");
                     direction = -1;
                 }
                 else if (direction < 1 || direction > 4)
                 {
-                    WriteLine("La direccion ingresada no es valida, por favor ingrese un numero entre 1 y 4");
+                    WriteLine("La direccion ingresada no es valida, por favor ingrese un numero entre 1 y 4.");
                     direction = -1;
                 }
             }
             while (direction < 1 || direction > 4);
 
-            WalkthroughResult (direction);
+            WalkthroughResult(direction);
         }
 
         public static void WalkthroughResult(int direction)
         {
-            // 1. Determinamos el nombre de la dirección
             string directionName = direction switch
             {
                 1 => "Norte",
@@ -370,14 +324,11 @@ namespace EFSM_Juego
                 _ => "dirección desconocida"
             };
 
-            WriteLine($"Caminas hacia el {directionName}...");
+            WriteLine($"Camina hacia el {directionName}...");
 
-            // Guardamos el estado inicial para poder mostrar desde dónde partió
             State previousState = world.CurrentState;
             string currentStateId = previousState.n_State;
 
-            // 2. Evaluamos la tabla de transiciones usando Tuple Pattern Matching
-            // Si la combinación no está declarada, cae en el caso por defecto "_" que devuelve "-"
             string nextStateId = (currentStateId, direction) switch
             {
                 ("q0", 1) => "q1",
@@ -427,23 +378,24 @@ namespace EFSM_Juego
                 
                 ("q12", 2) => "q2",
                 
-                _ => "-" // Movimiento inválido (cualquier combinación que sea '-')
+                _ => "-"
             };
 
-            // 3. Aplicamos el resultado de la tabla
             if (nextStateId == "-")
             {
-                WriteLine($"No puedes caminar hacia el {directionName} desde {previousState.Context}. Has llegado al límite del mundo.");
+                WriteLine($"Movimiento no permitido hacia el {directionName} desde {previousState.Context}. Límite del mundo alcanzado.");
             }
             else
             {
-                // Actualizamos el estado buscando la ID resultante en la lista de estados del mundo
                 world.CurrentState = world.States.Find(state => state.n_State == nextStateId)!;
-                
-                // Imprimimos de dónde a dónde viajó
-                WriteLine($"Has viajado desde [{previousState.Context}] hacia [{world.CurrentState.Context}].");
+                WriteLine($"Desplazamiento registrado: [{previousState.Context}] -> [{world.CurrentState.Context}].");
 
-                if (isSpawningEnemy())
+                if (CheckBossSpawn())
+                {
+                    WriteLine("Presencia anómala detectada.");
+                    SpawnBoss();
+                }
+                else if (isSpawningEnemy())
                 {
                     SpawnEnemy();
                 }
@@ -454,61 +406,93 @@ namespace EFSM_Juego
 
         public static void CheckEnvironmentalEffects()
         {
-            // Obtenemos el ID del lugar actual y el tipo de personaje para no escribir tanto
             string currentStateId = world.CurrentState.n_State;
             Character.Type type = player.CharacterType;
 
-            // --- ZONAS DE DESIERTO (q1: Dunas, q2: Pirámide, q3: Oasis, q12: Olin Rio) ---
             if (currentStateId == "q1" || currentStateId == "q2" || currentStateId == "q3" || currentStateId == "q12")
             {
-                // Condicional por tipo
-                if (type == Character.Type.MERMAID || type == Character.Type.WIZARD) //La sirena y el mago pierden vida en el desierto
+                if (type == Character.Type.MERMAID || type == Character.Type.WIZARD)
                 {
                     player.HP -= 3;
-                    WriteLine("Sientes una sed insaciable... Has perdido 3 de HP.");
+                    WriteLine("Penalización por entorno desértico. Reducción de 3 HP.");
                 }
                 
-                // Ejemplo extra: Condicional combinando otro atributo del Character (Speed)
                 if (player.Speed < 5)
                 {
                     player.HP -= 1;
-                    WriteLine("El sol implacable te agota debido a tu baja velocidad... Pierdes 1 de HP extra.");
+                    WriteLine("Penalización adicional por velocidad baja en entorno desértico. Reducción de 1 HP extra.");
                 }
             }
-
-            // --- ZONAS VOLCÁNICAS (q4: Ruinas Volcánicas, q5: Bosque Cenizas, q6: Kakacatepetl, q11: Castillo Salamander) ---
             else if (currentStateId == "q4" || currentStateId == "q5" || currentStateId == "q6" || currentStateId == "q11")
             {
-                // Todos pierden HP sin importar la clase
-                if(type != Character.Type.WIZARD) //El mago es inmune al calor volcánico por su afinidad con el elemento fuego, mientras que la sirena es resistente pero no inmune
+                if(type != Character.Type.WIZARD)
                 {
                     player.HP -= 6;
-                    WriteLine("Sientes cómo el calor abrazador del area consume tu cuerpo... Has perdido 6 de HP.");
+                    WriteLine("Daño por calor volcánico. Reducción de 6 HP.");
                 }
             }
-
-            // --- ZONAS DE AGUA (q7: Jardín, q8: Campo, q9: Ruinas, q10: San Marisco) ---
-            else if (currentStateId == "q7" || currentStateId == "q8" || currentStateId == "q9" || 
-                    currentStateId == "q10" )
+            else if (currentStateId == "q7" || currentStateId == "q8" || currentStateId == "q9" || currentStateId == "q10" )
             {
-                // Solo Caballero o Ladrón reciben penalización
                 if (type == Character.Type.KNIGHT || type == Character.Type.THIEF)
                 {
                     player.HP -= 4;
-                    WriteLine("El agua dificulta el movimiento de tu armadura/equipo y te ahogas un poco... Has perdido 4 de HP.");
+                    WriteLine("Penalización por movilidad en entorno acuático. Reducción de 4 HP.");
                 }
+            }
+        }
+
+        public static bool CheckBossSpawn()
+        {
+            if (player.Level >= 10)
+            {
+                return true;
+            }
+            else if (player.Level >= 5)
+            {
+                Random random = new Random();
+                int roll = random.Next(1, 101);
+                return roll <= 25;
+            }
+            return false;
+        }
+
+        public static Enemy.EnemyZone GetCurrentZone()
+        {
+            string id = world.CurrentState.n_State;
+            if (id == "q1" || id == "q2" || id == "q3" || id == "q12") return Enemy.EnemyZone.DESERT;
+            if (id == "q4" || id == "q5" || id == "q6" || id == "q11") return Enemy.EnemyZone.VOLCANIC;
+            return Enemy.EnemyZone.AQUATIC;
+        }
+
+        public static void SpawnBoss()
+        {
+            Enemy.EnemyZone currentZone = GetCurrentZone();
+            List<Enemy> bossList = enemies.FindAll(e => e.Zone == currentZone && e.isBoss == true);
+            
+            if (bossList.Count > 0)
+            {
+                Random random = new Random();
+                int index = random.Next(bossList.Count);
+                enemy = bossList[index];
+                bossTurnCount = 0;
+                bossIsDodging = false;
+                
+                ShowEnemyInfo();
+                do
+                {
+                    ShowCombatMenu();
+                } while (enemy != null && player.HP > 0 && (enemy.HP > 0 || enemy.Forgiveness == 0));
             }
         }
 
         public static bool isSpawningEnemy()
         {
-            int spawnChance = 30; // Probabilidad de que aparezca un enemigo (30%)
+            int spawnChance = 30;
             Random random = new Random();
-            int roll = random.Next(1, 101); // Genera un número entre 1 y 100
+            int roll = random.Next(1, 101);
             if (roll > spawnChance)
             {
-                // No aparece enemigo
-                WriteLine("El camino está despejado. No hay enemigos a la vista.");
+                WriteLine("Zona libre de hostilidades. Ningún enemigo detectado.");
                 return false;
             }
             else
@@ -526,9 +510,9 @@ namespace EFSM_Juego
                 case "q2":
                 case "q3":
                 case "q12":
-                //Cargamos la lista de enemigos del desierto
                     List<Enemy> desertEnemies = enemies.FindAll(enemy => enemy.Zone == Enemy.EnemyZone.DESERT && enemy.isBoss == false);
-                    if (desertEnemies.Count > 0)                    {
+                    if (desertEnemies.Count > 0)
+                    {
                         int index = random.Next(desertEnemies.Count);
                         enemy = desertEnemies[index];
                     }
@@ -538,7 +522,8 @@ namespace EFSM_Juego
                 case "q6":
                 case "q11":
                     List<Enemy> volcanicEnemies = enemies.FindAll(enemy => enemy.Zone == Enemy.EnemyZone.VOLCANIC && enemy.isBoss == false);
-                    if (volcanicEnemies.Count > 0)                    {
+                    if (volcanicEnemies.Count > 0)
+                    {
                         int index = random.Next(volcanicEnemies.Count);
                         enemy = volcanicEnemies[index];
                     }
@@ -548,7 +533,8 @@ namespace EFSM_Juego
                 case "q9":
                 case "q10":
                     List<Enemy> aquaticEnemies = enemies.FindAll(enemy => enemy.Zone == Enemy.EnemyZone.AQUATIC && enemy.isBoss == false);
-                    if (aquaticEnemies.Count > 0)                    {
+                    if (aquaticEnemies.Count > 0)
+                    {
                         int index = random.Next(aquaticEnemies.Count);
                         enemy = aquaticEnemies[index];
                     }
@@ -567,33 +553,29 @@ namespace EFSM_Juego
         public static void ShowEnemyInfo()
         {
             WriteLine("------------------------------");
-            WriteLine("¡Un enemigo salvaje aparece!");
+            WriteLine("Encuentro hostil.");
             WriteLine("Tipo de Enemigo: " + enemy.Type);
             WriteLine("HP: " + enemy.HP + "/" + enemy.healt_max);
             WriteLine("Velocidad: " + enemy.Speed);
             WriteLine("Daño: " + enemy.Damage);
-            WriteLine("Probabilidad de Critico: " +
-            enemy.CritictRate * 100 +
-            "%");
-            WriteLine("Probabilidad de Misericordia: " +
-            enemy.Probability_Mercy * 100 +
-            "%");
+            WriteLine("Probabilidad de Critico: " + enemy.CritictRate * 100 + "%");
+            WriteLine("Probabilidad de Misericordia: " + enemy.Probability_Mercy * 100 + "%");
             if (enemy.isBoss)
             {
-                WriteLine("¡Cuidado! Este enemigo es un jefe.");
+                WriteLine("Advertencia: Entidad de nivel jefe detectada.");
             }
             WriteLine("------------------------------");
         } 
 
         public static void ShowCombatMenu()
         {
-           WriteCentered("------------------------------------------");
+            WriteCentered("------------------------------------------");
             WriteCentered("¿Qué acción desea realizar?");
             WriteCentered("1 - Atacar");
             WriteCentered("2 - Pedir Misericordia");
             WriteCentered("3 - Curarse");
-            WriteCentered("4- Informacion del Enemigo");
-            WriteCentered("5- Informacion del Personaje");
+            WriteCentered("4 - Informacion del Enemigo");
+            WriteCentered("5 - Informacion del Personaje");
             WriteCentered("6 - Huir");
             WriteCentered("------------------------------------------");
 
@@ -606,15 +588,15 @@ namespace EFSM_Juego
                 string? input = ReadLine();
                 if (!int.TryParse(input, out optionSelected))
                 {
-                    WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 1 y 6");
+                    WriteLine("El valor ingresado no es un numero valido, por favor ingrese un numero entre 1 y 6.");
                     optionSelected = -1;
                 }
                 else if (optionSelected < 1 || optionSelected > 6)
                 {
-                    WriteLine("La opcion seleccionada no es valida, por favor ingrese un numero entre 1 y 6");
+                    WriteLine("La opcion seleccionada no es valida, por favor ingrese un numero entre 1 y 6.");
                     optionSelected = -1;
                 }
-            }while (optionSelected < 1 || optionSelected > 6);
+            } while (optionSelected < 1 || optionSelected > 6);
 
             switch (optionSelected)
             {
@@ -622,7 +604,7 @@ namespace EFSM_Juego
                     CombatRoutine();
                     break;
                 case 2:
-                   PrayMercy();
+                    PrayMercy();
                     break;
                 case 3:
                     HealRoutine();
@@ -638,61 +620,52 @@ namespace EFSM_Juego
                     break;
             }
             
-            isLevelingUp(); // Verificamos si el jugador sube de nivel después de su acción en combate
+            isLevelingUp();
         }
 
         public static float AttackBar()
         {
-            int barLength = 30; // Tamaño de la barra
+            int barLength = 30;
             int pos = 0;
             int direction = 1;
             
-            // Ocultamos el cursor para que no parpadee molesto mientras se dibuja la barra
             CursorVisible = false;
 
-            // Limpiamos cualquier tecla que se haya quedado en el buffer por accidente
             while (KeyAvailable) ReadKey(true);
 
-            WriteLine("¡Presiona ESPACIO en el momento justo!");
+            WriteLine("Presione ESPACIO para determinar precisión.");
             
             while (true)
             {
-                // Detectamos si el usuario presionó la barra espaciadora
                 if (KeyAvailable)
                 {
                     if (ReadKey(true).Key == ConsoleKey.Spacebar) break;
                 }
 
-                // Sobreescribimos la misma línea en la consola usando retorno de carro
                 string bar = "\r[";
                 for (int i = 0; i < barLength; i++)
                 {
                     if (i == barLength / 2) 
-                        bar += (i == pos) ? "█" : "I"; // Centro exacto
+                        bar += (i == pos) ? "█" : "I";
                     else 
-                        bar += (i == pos) ? "█" : "-"; // Espacio normal
+                        bar += (i == pos) ? "█" : "-";
                 }
                 bar += "]";
                 Write(bar);
 
-                // Movemos el indicador
                 pos += direction;
                 
-                // Si toca un borde, rebota
                 if (pos <= 0 || pos >= barLength - 1) direction *= -1;
 
-                // Esto controla la velocidad del minijuego (menor número = más rápido)
                 System.Threading.Thread.Sleep(30); 
             }
 
             CursorVisible = true;
             WriteLine();
 
-            // Calculamos el multiplicador basado en la distancia al centro
             float center = barLength / 2.0f;
             float distance = Math.Abs(center - pos);
             
-            // Daño máximo (1.0) en el centro, disminuye hacia los bordes (mínimo 0.2)
             float accuracy = 1.0f - (distance / center);
             if (accuracy < 0.2f) accuracy = 0.2f;
 
@@ -709,7 +682,7 @@ namespace EFSM_Juego
 
             while (KeyAvailable) ReadKey(true);
 
-            WriteLine("¡Presiona ESPACIO en el momento justo!");
+            WriteLine("Presione ESPACIO para determinar precisión de curación.");
             
             while (true)
             {
@@ -722,9 +695,9 @@ namespace EFSM_Juego
                 for (int i = 0; i < barLength; i++)
                 {
                     if (i == barLength / 2) 
-                        bar += (i == pos) ? "♥" : "+"; 
+                        bar += (i == pos) ? "H" : "+"; 
                     else 
-                        bar += (i == pos) ? "♥" : "-"; 
+                        bar += (i == pos) ? "H" : "-"; 
                 }
                 bar += "]";
                 Write(bar);
@@ -752,24 +725,29 @@ namespace EFSM_Juego
         {
             float accuracyMultiplier = AttackBar();
 
-            // Calculamos el daño base afectado por el multiplicador del minijuego
+            if (bossIsDodging)
+            {
+                WriteLine("El objetivo evadió el ataque.");
+                bossIsDodging = false;
+                return;
+            }
+
             float finalDamage = player.Damage * accuracyMultiplier;
 
-            // Evaluamos si el golpe es crítico
             Random rand = new Random();
             bool isCritical = rand.NextDouble() <= player.CritictRate;
 
             if (isCritical)
             {
-                finalDamage *= 2.0f; // Multiplicador por daño crítico
-                WriteLine("¡GOLPE CRÍTICO!");
+                finalDamage *= 2.0f;
+                WriteLine("Impacto crítico registrado.");
             }
 
             int damageApplied = (int)Math.Round(finalDamage);
-            enemy.HP -= damageApplied; // Asumiendo que la clase Enemy tiene la propiedad HP
+            enemy.HP -= damageApplied;
 
-            WriteLine($"Has atacado con una precisión del {Math.Round(accuracyMultiplier * 100)}%.");
-            WriteLine($"¡Has infligido {damageApplied} de daño!");
+            WriteLine($"Precisión calculada: {Math.Round(accuracyMultiplier * 100)}%.");
+            WriteLine($"Daño ejecutado: {damageApplied}.");
         }
 
         public static void PlayerHeal()
@@ -784,8 +762,8 @@ namespace EFSM_Juego
                 player.HP = player.healt_max;
             }
 
-            WriteLine($"Te has curado con una precisión del {Math.Round(accuracyMultiplier * 100)}%.");
-            WriteLine($"¡Has recuperado {healApplied} de HP! Tu salud actual es {player.HP}/{player.healt_max}.");
+            WriteLine($"Eficacia de curación: {Math.Round(accuracyMultiplier * 100)}%.");
+            WriteLine($"Recuperación: {healApplied} HP. Salud actual: {player.HP}/{player.healt_max}.");
         }
 
         public static void EnemyAttack()
@@ -795,39 +773,92 @@ namespace EFSM_Juego
             if(isCritical)
             {
                 player.HP -= (int)(enemy.Damage * 2.0f);
-                WriteLine("¡El enemigo ha asestado un GOLPE CRÍTICO!");
-                WriteLine($"Has recibido {(int)(enemy.Damage * 2.0f)} de daño.");
+                WriteLine("El enemigo ha ejecutado un impacto crítico.");
+                WriteLine($"Daño recibido: {(int)(enemy.Damage * 2.0f)}.");
             }
             else
             {
                 player.HP -= (int)enemy.Damage;
-                WriteLine($"El enemigo te ha atacado e infligido {(int)enemy.Damage} de daño.");
+                WriteLine($"Ataque enemigo recibido. Daño: {(int)enemy.Damage}.");
+            }
+        }
+
+        public static void BossAutomatonTurn()
+        {
+            bossTurnCount++;
+            string nextState = "q1";
+
+            if (bossTurnCount % 4 == 0) 
+            {
+                nextState = "q4";
+            }
+            else
+            {
+                Random rand = new Random();
+                int roll = rand.Next(1, 101);
+                if (roll <= 25) nextState = "q3";
+                else if (roll <= 60) nextState = "q2";
+                else nextState = "q1";
+            }
+
+            switch (nextState)
+            {
+                case "q1":
+                    WriteLine($"[{enemy.Type}] ejecuta patrón de ataque estándar.");
+                    EnemyAttack();
+                    break;
+
+                case "q2":
+                    WriteLine($"[{enemy.Type}] analiza vulnerabilidad de clase {player.CharacterType} y ataca.");
+                    float damageMultiplier = 1.0f;
+                    switch (player.CharacterType)
+                    {
+                        case Character.Type.KNIGHT: damageMultiplier = 1.5f; break;
+                        case Character.Type.WIZARD: damageMultiplier = 1.8f; break;
+                        case Character.Type.THIEF: damageMultiplier = 1.2f; break;
+                        case Character.Type.MERMAID: damageMultiplier = 1.4f; break;
+                    }
+                    int classDamage = (int)(enemy.Damage * damageMultiplier);
+                    player.HP -= classDamage;
+                    WriteLine($"Daño crítico por afinidad de clase recibido: {classDamage}.");
+                    break;
+
+                case "q3":
+                    WriteLine($"[{enemy.Type}] asume postura de evasión. El siguiente ataque será neutralizado.");
+                    bossIsDodging = true;
+                    break;
+
+                case "q4":
+                    WriteLine($"[{enemy.Type}] alcanza carga máxima y ejecuta habilidad definitiva.");
+                    int ultiDamage = (int)(enemy.Damage * 2.5f);
+                    player.HP -= ultiDamage;
+                    WriteLine($"Impacto máximo recibido. Daño: {ultiDamage}.");
+                    break;
             }
         }
 
         public static void CombatRoutine()
         {
             WriteLine("------------------------------");
-            WriteLine($"¡Inicia el intercambio de ataques contra {enemy.Type}!");
+            WriteLine($"Iniciando fase de combate contra {enemy.Type}.");
 
-            // Comparamos velocidades
             if (player.Speed >= enemy.Speed)
             {
-                WriteLine("¡Eres más rápido!.");
+                WriteLine("Ventaja de velocidad. Turno aliado.");
                 PlayerAttack();
                 
-                // Si el enemigo sobrevive, ataca de vuelta
                 if (enemy.HP > 0) 
                 {
-                    EnemyAttack(); // Deberás crear este método para restarle HP al player
+                    if (enemy.isBoss) { BossAutomatonTurn(); }
+                    else { EnemyAttack(); }
                 }
             }
             else
             {
-                WriteLine("¡El enemigo es más veloz y ataca primero!");
-                EnemyAttack(); 
+                WriteLine("Desventaja de velocidad. Turno enemigo.");
+                if (enemy.isBoss) { BossAutomatonTurn(); }
+                else { EnemyAttack(); }
                 
-                // Si el jugador sobrevive, ataca
                 if (player.HP > 0) 
                 {
                     PlayerAttack();
@@ -836,9 +867,9 @@ namespace EFSM_Juego
             
             if (enemy.HP <= 0)
             {
-                WriteLine("¡Has derrotado al enemigo!");
-                player.XP_STORAGED += enemy.XP_DROPPED; // Ejemplo de recompensa por victoria
-                enemy = null; // Limpiamos el enemigo actual
+                WriteLine("Objetivo eliminado.");
+                player.XP_STORAGED += enemy.XP_DROPPED;
+                enemy = null;
             }
             WriteLine("------------------------------");
         }
@@ -853,13 +884,15 @@ namespace EFSM_Juego
                 
                 if (enemy.HP > 0) 
                 {
-                    EnemyAttack(); 
+                    if (enemy.isBoss) { BossAutomatonTurn(); }
+                    else { EnemyAttack(); }
                 }
             }
             else
             {
-                WriteLine("¡El enemigo es más veloz y ataca primero!");
-                EnemyAttack(); 
+                WriteLine("Desventaja de velocidad. Turno enemigo.");
+                if (enemy.isBoss) { BossAutomatonTurn(); }
+                else { EnemyAttack(); }
                 
                 if (player.HP > 0) 
                 {
@@ -876,8 +909,7 @@ namespace EFSM_Juego
                 player.Level++;
                 player.XP_STORAGED -= 100; 
                 player.HP = player.healt_max; 
-                WriteLine($"¡Felicidades! Has subido al nivel {player.Level}.");
-               
+                WriteLine($"Nivel incrementado: {player.Level}.");
             }
         }
 
@@ -886,28 +918,30 @@ namespace EFSM_Juego
             Random rand = new Random();
             if (rand.NextDouble() <= enemy.Probability_Mercy)
             {
-                WriteLine("¡El enemigo ha sentido tu súplica y decide perdonarte! Has ganado la batalla sin luchar.");
-                enemy = null; // El enemigo desaparece
+                WriteLine("Petición de cese al fuego aceptada por la entidad enemiga. Combate finalizado.");
+                enemy = null;
             }
             else
             {
-                WriteLine("El enemigo ignora tu petición de misericordia y continúa atacando.");
-                EnemyAttack(); // El enemigo ataca como castigo por pedir misericordia
+                WriteLine("Petición rechazada. El combate prosigue.");
+                if (enemy.isBoss) { BossAutomatonTurn(); }
+                else { EnemyAttack(); }
             }
         }
 
         public static void Flee()
         {
             Random rand = new Random();
-            if (rand.NextDouble() <= 0.05) // 5% de probabilidad de huir exitosamente
+            if (rand.NextDouble() <= 0.05)
             {
-                WriteLine("¡Has logrado huir del combate! Escapas ileso.");
-                enemy = null; // El enemigo desaparece
+                WriteLine("Evasión de combate exitosa.");
+                enemy = null;
             }
             else
             {
-                WriteLine("¡No has podido escapar! El enemigo aprovecha tu intento de huida para atacarte.");
-                EnemyAttack(); // El enemigo ataca como castigo por intentar huir
+                WriteLine("Fallo en intento de evasión. El enemigo contraataca.");
+                if (enemy.isBoss) { BossAutomatonTurn(); }
+                else { EnemyAttack(); }
             }
         }
     }
