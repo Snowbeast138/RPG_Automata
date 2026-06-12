@@ -18,7 +18,8 @@ namespace EFSM_Juego
 
         static Enemy enemy = null;
 
-        // Variables para el Autómata del Jefe
+        // Variables y Autómata para el Jefe
+        static Automata bossBehavior = DefiningBossAutomaton();
         static bool bossIsDodging = false;
         static int bossTurnCount = 0;
 
@@ -224,6 +225,18 @@ namespace EFSM_Juego
             world.AddState(new State("Olin Oir", "q12"));
 
             return world;
+        }
+
+        public static Automata DefiningBossAutomaton()
+        {
+            Automata bossBehavior = new Automata();
+
+            bossBehavior.AddState(new State("Ataque Normal", "q1"));
+            bossBehavior.AddState(new State("Ataque por Clase", "q2"));
+            bossBehavior.AddState(new State("Esquivar", "q3"));
+            bossBehavior.AddState(new State("Ultimate", "q4"));
+
+            return bossBehavior;
         }
 
         public static void WriteCentered(string text)
@@ -474,8 +487,11 @@ namespace EFSM_Juego
                 Random random = new Random();
                 int index = random.Next(bossList.Count);
                 enemy = bossList[index];
+                
+                // Inicializar variables del autómata del jefe
                 bossTurnCount = 0;
                 bossIsDodging = false;
+                bossBehavior.CurrentState = bossBehavior.States.Find(state => state.n_State == "q1");
                 
                 ShowEnemyInfo();
                 do
@@ -786,30 +802,35 @@ namespace EFSM_Juego
         public static void BossAutomatonTurn()
         {
             bossTurnCount++;
-            string nextState = "q1";
+            string nextStateId = "q1";
 
+            // Determinar el identificador del siguiente estado
             if (bossTurnCount % 4 == 0) 
             {
-                nextState = "q4";
+                nextStateId = "q4";
             }
             else
             {
                 Random rand = new Random();
                 int roll = rand.Next(1, 101);
-                if (roll <= 25) nextState = "q3";
-                else if (roll <= 60) nextState = "q2";
-                else nextState = "q1";
+                if (roll <= 25) nextStateId = "q3";
+                else if (roll <= 60) nextStateId = "q2";
+                else nextStateId = "q1";
             }
 
-            switch (nextState)
+            // Realizar la transición de estado en el autómata del jefe
+            bossBehavior.CurrentState = bossBehavior.States.Find(state => state.n_State == nextStateId)!;
+
+            // Ejecutar la acción basada en el estado actual del autómata
+            switch (bossBehavior.CurrentState.n_State)
             {
-                case "q1":
-                    WriteLine($"[{enemy.Type}] ejecuta patrón de ataque estándar.");
+                case "q1": // Ataque Normal
+                    WriteLine($"[{enemy.Type}] ejecuta estado: {bossBehavior.CurrentState.Context}.");
                     EnemyAttack();
                     break;
 
-                case "q2":
-                    WriteLine($"[{enemy.Type}] analiza vulnerabilidad de clase {player.CharacterType} y ataca.");
+                case "q2": // Ataque por Clase
+                    WriteLine($"[{enemy.Type}] ejecuta estado: {bossBehavior.CurrentState.Context}. Analiza vulnerabilidad de clase {player.CharacterType}.");
                     float damageMultiplier = 1.0f;
                     switch (player.CharacterType)
                     {
@@ -823,13 +844,13 @@ namespace EFSM_Juego
                     WriteLine($"Daño crítico por afinidad de clase recibido: {classDamage}.");
                     break;
 
-                case "q3":
-                    WriteLine($"[{enemy.Type}] asume postura de evasión. El siguiente ataque será neutralizado.");
+                case "q3": // Esquivar
+                    WriteLine($"[{enemy.Type}] ejecuta estado: {bossBehavior.CurrentState.Context}. El siguiente ataque será neutralizado.");
                     bossIsDodging = true;
                     break;
 
-                case "q4":
-                    WriteLine($"[{enemy.Type}] alcanza carga máxima y ejecuta habilidad definitiva.");
+                case "q4": // Ultimate
+                    WriteLine($"[{enemy.Type}] ejecuta estado: {bossBehavior.CurrentState.Context}. Alcanza carga máxima y ejecuta habilidad definitiva.");
                     int ultiDamage = (int)(enemy.Damage * 2.5f);
                     player.HP -= ultiDamage;
                     WriteLine($"Impacto máximo recibido. Daño: {ultiDamage}.");
